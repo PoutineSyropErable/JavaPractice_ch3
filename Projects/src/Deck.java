@@ -1,58 +1,50 @@
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 
-
+// Deck class holding cards and using ArrayList
 public class Deck implements Iterable<Card> {
-    // CustomArrayList to hold cards
-    private CustomArrayList<Card> aCards;
+    private final ArrayList<Card> aCards;
 
-    // Constructor to initialize the deck
     public Deck() {
-        aCards = new CustomArrayList<>();
+        aCards = new ArrayList<>();
+    }
 
-        // Example cards added to the deck
-        aCards.add(new Card("Hearts", "Ace"));
-        aCards.add(new Card("Spades", "King"));
-        aCards.add(new Card("Diamonds", "Queen"));
-        aCards.add(new Card("Clubs", "Jack"));
-        aCards.add(new Card("Hearts", "2"));
+    public void addCard(Card card) {
+        aCards.add(card);
     }
 
     public void sortBySuitFirst() {
-		
-
-		// Collections.sort(aCards, Card.CompareBySuitFirst.getInstance());
-
-		// ^^ If I used a regular array list.
-		// ArrayList implements List (interface)
-		// List extends Collections (Inheritence)
-		// Collections extends Itterable. 
-		// Itterable, Collections and List are Interface (Abstract class). ArrayList is a concrete class. 
-
-
-        aCards.sort(Card.CompareBySuitFirst.getInstance());
+        Collections.sort(aCards, CompareBySuitFirst.getInstance());
     }
 
-    // Implementing the iterator() method
+    // Nested Comparator class for comparing by suit first, Singleton design pattern
+    public static class CompareBySuitFirst implements Comparator<Card> {
+        // Single instance of the comparator
+        private static final CompareBySuitFirst INSTANCE = new CompareBySuitFirst();
+
+        // Private constructor to prevent external instantiation
+        private CompareBySuitFirst() {}
+
+        // Public method to access the singleton instance
+        public static CompareBySuitFirst getInstance() {
+            return INSTANCE;
+        }
+
+        // Comparison method to compare by suit first, then by rank
+        @Override
+        public int compare(Card pCard1, Card pCard2) {
+            int suitComparison = pCard1.getSuit().compareTo(pCard2.getSuit());
+            if (suitComparison != 0) {
+                return suitComparison;  // Compare by suit first
+            }
+            return pCard1.getRank().compareTo(pCard2.getRank());  // Then compare by rank
+        }
+    }
+
     @Override
     public Iterator<Card> iterator() {
         return aCards.iterator();
-    }
-
-    // Main method to test the Deck class with CustomArrayList
-    public static void main(String[] args) {
-        Deck deck = new Deck();
-        
-        System.out.println("Before Sorting:");
-        for (Card card : deck) {
-            System.out.println(card);
-        }
-
-        deck.sortBySuitFirst();
-
-        System.out.println("\nAfter Sorting by Suit First:");
-        for (Card card : deck) {
-            System.out.println(card);
-        }
     }
 }
